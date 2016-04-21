@@ -48,6 +48,7 @@ GameEngine.prototype.draw = function(){
 GameEngine.prototype.nextLevel = function(){
 	this.init();
 	this.dungeon = this.dungeonGenerator.generate();
+	this.camera = new Camera(this.dungeon);
 	this.map = this.dungeon.currentRoom.map();
 };
 
@@ -63,7 +64,7 @@ window.onload = function(){
 		{name:"playerJump", src:"sprites/jump.png", length: 8, loop: 7, type: "animation"},
 		{name:"playerFall", src:"sprites/fall.png", length: 6, type: "animation"},
 		{name:"tileWall", src:"sprites/tileWall.png"},
-		{name:"tileFloor", src:"sprites/tileFloor.png"},
+		{name:"tileFloor", src:"sprites/stoneFloor.png"},
 		{name:"tileDoor", src:"sprites/tileDoor.png"}
 	],
 	function(){

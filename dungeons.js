@@ -154,6 +154,7 @@ function Camera(dungeon){
 	this.y = dungeon.entrance.y * Tile.size * Room.height;
 	this.targetX = this.x;
 	this.targetY = this.y;
+	this.moving = false;
 }
 
 Camera.prototype.getTileAt = function(x,y){
@@ -174,19 +175,21 @@ Camera.prototype.update = function(){
 		this.x = this.targetX;
 		this.y = this.targetY;
 		Game.paused = false;
+		this.moving = false;
 	} else {
 		Game.paused = true;
-		Game.player.x -= dx*0.8/10;
-		Game.player.y -= dy*0.7/10;
-		this.x += dx/10;
-		this.y += dy/10;
+		Game.player.x -= dx*0.8/5;
+		Game.player.y -= dy*0.7/5;
+		this.x += dx/5;
+		this.y += dy/5;
+		this.moving = true;
 	}
 };
 
 Camera.prototype.draw = function(gfx){
-	for(var y = 0; y < Room.height; y++){
+	for(var y = -1; y <= Room.height; y++){
 		var posY = y*Tile.size;
-		for(var x = 0; x < Room.width; x++){
+		for(var x = -1; x <= Room.width; x++){
 			var posX = x*Tile.size;
 			var tile = this.getTileAt(this.x+posX,this.y+posY);
 			if(tile) tile.draw(gfx,posX-this.x%Tile.size,posY-this.y%Tile.size);
