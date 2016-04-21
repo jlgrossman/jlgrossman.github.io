@@ -152,11 +152,11 @@ function Camera(dungeon){
 	this.dungeon = dungeon;
 	this.x = dungeon.entrance.x * Tile.size * Room.width;
 	this.y = dungeon.entrance.y * Tile.size * Room.height;
+	this.targetX = this.x;
+	this.targetY = this.y;
 }
 
 Camera.prototype.getTileAt = function(x,y){
-	//x /= Room.width;
-	//y /= Room.height;
 	var roomX = Math.floor(x/Room.width/Tile.size);
 	var roomY = Math.floor(y/Room.height/Tile.size);
 	var tileX = Math.floor((x-roomX*Room.width*Tile.size)/Tile.size);
@@ -164,6 +164,22 @@ Camera.prototype.getTileAt = function(x,y){
 	var room = this.dungeon.rooms.get(roomX,roomY);
 	if(room){
 		return room.map().tiles.get(tileX,tileY);
+	}
+};
+
+Camera.prototype.update = function(){
+	var dx = this.targetX - this.x;
+	var dy = this.targetY - this.y;
+	if(Math.abs(dx) + Math.abs(dy) < 1){
+		this.x = this.targetX;
+		this.y = this.targetY;
+		Game.paused = false;
+	} else {
+		Game.paused = true;
+		Game.player.x -= dx*0.8/10;
+		Game.player.y -= dy*0.7/10;
+		this.x += dx/10;
+		this.y += dy/10;
 	}
 };
 

@@ -38,26 +38,30 @@ Player.prototype.update = function(){
 		if(type == Tile.door){
 			if(tileX == 0){
 				Game.dungeon.currentRoom = Game.dungeon.currentRoom.doors[Direction.left];
-				this.x = 336;
+				Game.camera.targetX = Game.camera.x - Tile.size*16;
+				//this.x = 336;
 			} else if(tileX == 15){
 				Game.dungeon.currentRoom = Game.dungeon.currentRoom.doors[Direction.right];
-				this.x = 24;
+				Game.camera.targetX = Game.camera.x + Tile.size*16;
+				//this.x = 24;
 			} else if(tileY == 0){
 				Game.dungeon.currentRoom = Game.dungeon.currentRoom.doors[Direction.up];
-				this.y = 190;
+				Game.camera.targetY = Game.camera.y - Tile.size*10;
+				//this.y = 190;
 			} else if(tileY == 9){
 				Game.dungeon.currentRoom = Game.dungeon.currentRoom.doors[Direction.down];
-				this.y = 24;
+				Game.camera.targetY = Game.camera.y + Tile.size*10;
+				//this.y = 24;
 			}
 			Game.map = Game.dungeon.currentRoom.map();
 		}
 		this.vx = 0;
 		this.vy = 0;
 	}
-	Game.camera.x += this.vx;
-	Game.camera.y += this.vy;
-	//this.x += this.vx;
-	//this.y += this.vy;
+	//Game.camera.x += this.vx;
+	//Game.camera.y += this.vy;
+	this.x += this.vx;
+	this.y += this.vy;
 	this.vx *= 0.5;
 	this.vy *= 0.5;
 	this.currentAnimation.update();

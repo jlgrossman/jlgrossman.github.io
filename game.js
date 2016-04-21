@@ -30,6 +30,7 @@ GameEngine.prototype.update = function(){
 		this.player.update();
 		this.map.update();
 	}
+	this.camera.update();
 	Mouse.update();
 	Key.update();
 };
