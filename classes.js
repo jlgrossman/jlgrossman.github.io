@@ -5,7 +5,6 @@ function Player(){
 	this.vx = 0;
 	this.vy = 0;
 	this.currentAnimation = Sprites.playerRun;
-	this.onGround = false;
 }
 
 Player.prototype.currentTile = function(){
@@ -55,8 +54,10 @@ Player.prototype.update = function(){
 		this.vx = 0;
 		this.vy = 0;
 	}
-	this.x += this.vx;
-	this.y += this.vy;
+	Game.camera.x += this.vx;
+	Game.camera.y += this.vy;
+	//this.x += this.vx;
+	//this.y += this.vy;
 	this.vx *= 0.5;
 	this.vy *= 0.5;
 	this.currentAnimation.update();

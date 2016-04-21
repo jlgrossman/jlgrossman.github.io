@@ -11,8 +11,10 @@ Tile.wall = 1;
 Tile.door = 2;
 Tile.spriteNames = ["tileFloor", "tileWall", "tileDoor"];
 
-Tile.prototype.draw = function(gfx){
-	this.sprite.draw(gfx,this.x, this.y);
+Tile.size = 24;
+
+Tile.prototype.draw = function(gfx,x,y){
+	this.sprite.draw(gfx,x||this.x, y||this.y);
 };
 
 Tile.prototype.update = function(){
@@ -26,11 +28,11 @@ function Map(tileArray, tileSize){
 		this.tiles = new Array2D(tileArray.width, tileArray.height);
 		for(var y = 0; y < tileArray.height; y++){
 			for(var x = 0; x < tileArray.width; x++){
-				this.tiles.set(x,y, new Tile(x * 24, y * 24, tileArray.get(x,y)));
+				this.tiles.set(x,y, new Tile(x * Tile.size, y * Tile.size, tileArray.get(x,y)));
 			}
 		}
 	}
-	this.tileSize = tileSize||24;
+	this.tileSize = tileSize||Tile.size;
 }
 
 Map.prototype.get = function(x,y){ return this.tiles.get(Math.floor(x/this.tileSize), Math.floor(y/this.tileSize)); };
@@ -43,9 +45,13 @@ Map.prototype.update = function(){
 	}
 };
 
-Map.prototype.draw = function(gfx){
-	for(var y = 0; y < this.tiles.height; y++){
-		for(var x = 0; x < this.tiles.width; x++){
+Map.prototype.draw = function(gfx, startX, startY, endX, endY){
+	startX = startX||0;
+	startY = startY||0;
+	endX = endX||this.tiles.width;
+	endY = endY||this.tiles.height;
+	for(var y = startY; y < endY; y++){
+		for(var x = startX; x < endX; x++){
 			this.tiles.get(x,y).draw(gfx);
 		}
 	}

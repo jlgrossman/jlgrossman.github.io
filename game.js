@@ -11,6 +11,7 @@ function GameEngine(graphics, width, height){
 	this.dungeonGenerator = new DungeonGenerator(0);
 	this.dungeon = this.dungeonGenerator.generate();
 	this.map = this.dungeon.currentRoom.map();
+	this.camera = new Camera(this.dungeon);
 	this.init();
 }
 
@@ -38,7 +39,7 @@ GameEngine.prototype.draw = function(){
 		this.graphics.fillStyle = "rgba(255,255,255,0.65)";
 		this.graphics.fillRect(0,0,this.width, this.height);
 		
-		this.map.draw(this.graphics);
+		this.camera.draw(this.graphics);
 		this.player.draw(this.graphics);
 	}
 };
