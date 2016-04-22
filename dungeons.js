@@ -23,9 +23,18 @@ Room.prototype.map = function(){
 		var tiles = new Array2D(Room.width, Room.height);
 		for(var y = 0; y < Room.height; y++){
 			for(var x = 0; x < Room.width; x++){
-				if(y == 0 || y == Room.height-1) tiles.set(x,y,1);
-				else if(x == 0 || x == Room.width-1) tiles.set(x,y,1);
-				else tiles.set(x,y,0);
+				if(y == 0){
+					if(x == 0) tiles.set(x,y,Tile.wallTopLeft);
+					else if(x == Room.width-1) tiles.set(x,y,Tile.wallTopRight);
+					else tiles.set(x,y,Tile.wallTop);
+				} else if(y == Room.height-1){
+					if(x == 0) tiles.set(x,y,Tile.wallBottomLeft);
+					else if(x == Room.width-1) tiles.set(x,y,Tile.wallBottomRight);
+					else tiles.set(x,y,Tile.wallBottom);
+				} 
+				else if(x == 0) tiles.set(x,y,Tile.wallLeft);
+				else if(x == Room.width-1) tiles.set(x,y,Tile.wallRight);
+				else tiles.set(x,y,Tile.floor);
 			}
 		}
 		for(var i = 0; i < 4; i++){
@@ -33,9 +42,9 @@ Room.prototype.map = function(){
 				var v = Direction.vector(i);
 				var x = (v.x == 0)?(8):(7.5+v.x*7.5);
 				var y = (v.y == 0)?(5):(4.5+v.y*4.5);
-				tiles.set(x,y,2);
-				if(v.x == 0) tiles.set(x-1, y, 2);
-				else tiles.set(x, y-1, 2);
+				tiles.set(x,y,Tile.door);
+				if(v.x == 0) tiles.set(x-1, y, Tile.door);
+				else tiles.set(x, y-1, Tile.door);
 			}
 		}
 		this.tileMap = new Map(tiles);
@@ -108,46 +117,6 @@ DungeonGenerator.prototype.generate = function(){
 	return dungeon;
 };
 
-/*function Camera(dungeon){
-	this.dungeon = dungeon;
-	this.currentRoom = dungeon.entrance;
-	this.nextRoom = undefined;
-	this.transitionFrame = 0;
-	this.x = 0;
-	this.y = 0;
-	this.vx = 0;
-	this.vy = 0;
-}
-
-Camera.prototype.transition = function(nextRoom, direction){
-	var delta = Direction.vector(direction);
-	this.vx = -(delta.x * 24);
-	this.vy = -(delta.y * 24);
-	this.transitionFrame = Math.abs(delta.x*16) + Math.abs(delta.y*10);
-};
-
-Camera.prototype.update = function(){
-	if(this.transitionFrame-- > 0){
-		this.x += this.vx;
-		this.y += this.vy;
-	} else {
-		if(this.nextRoom){
-			this.currentRoom = this.nextRoom;
-			this.nextRoom = undefined;
-		} else {
-			this.currentRoom.map().update();
-		}
-	}
-};
-
-Camera.prototype.draw = function(gfx){
-	if(this.nextRoom){
-		this.currentRoom.draw(gfx,this.x,this.y,16-this.x,10-this.y);
-	} else {
-		this.currentRoom.draw(gfx);
-	}
-};*/
-
 function Camera(dungeon){
 	this.dungeon = dungeon;
 	this.x = dungeon.entrance.x * Tile.size * Room.width;
@@ -199,8 +168,8 @@ Camera.prototype.draw = function(gfx){
 
 function traceDungeon(d){
 	var str = "[";
-	for(var y = 0; y < d.height; y++){
-		for(var x = 0; x < d.width; x++){
+	for(var y = 0; y < Dungeon.height; y++){
+		for(var x = 0; x < Dungeon.width; x++){
 			if(d.rooms.get(x,y) == undefined){
 				str += "0 ";
 			} else {

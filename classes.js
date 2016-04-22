@@ -58,12 +58,16 @@ Player.prototype.update = function(){
 		this.vx = 0;
 		this.vy = 0;
 	}
-	//Game.camera.x += this.vx;
-	//Game.camera.y += this.vy;
+	var v = this.vx*this.vx+this.vy*this.vy;
+	if(v>1){
+		v = Math.sqrt(v);
+		this.vx *= 1/v;
+		this.vy *= 1/v;
+	}
 	this.x += this.vx;
 	this.y += this.vy;
-	this.vx *= 0.5;
-	this.vy *= 0.5;
+	this.vx *= 0.8;
+	this.vy *= 0.8;
 	this.currentAnimation.update();
 };
 

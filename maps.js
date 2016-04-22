@@ -8,8 +8,16 @@ function Tile(x, y, type){
 
 Tile.floor = 0;
 Tile.wall = 1;
-Tile.door = 2;
-Tile.spriteNames = ["tileFloor", "tileWall", "tileDoor"];
+Tile.wallLeft = 2;
+Tile.wallRight = 3;
+Tile.wallTop = 4;
+Tile.wallBottom = 5;
+Tile.wallTopLeft = 6;
+Tile.wallTopRight = 7;
+Tile.wallBottomRight = 8;
+Tile.wallBottomLeft = 9;
+Tile.door = 10;
+Tile.spriteNames = ["tileFloor", "wall", "wallLeft", "wallRight", "wallTop", "wallBottom", "wallTopLeft", "wallTopRight", "wallBottomRight", "wallBottomLeft", "tileFloor"];
 
 Tile.size = 24;
 
