@@ -47,9 +47,18 @@ Room.prototype.map = function(){
 				else tiles.set(x, y-1, Tile.door);
 			}
 		}
+		if(this.type == Room.entrance){
+			tiles.set(4,4,Tile.stairsUp);
+		} else if(this.type == Room.exit){
+			tiles.set(4,4,Tile.stairsDown);
+		}
 		this.tileMap = new Map(tiles);
 	}
 	return this.tileMap;
+};
+
+Room.prototype.update = function(){
+	if(this.tileMap) this.tileMap.update();
 };
 
 function Dungeon(level){
@@ -58,6 +67,7 @@ function Dungeon(level){
 	this.doors = new Array2D(20,20);
 	this.currentRoom = undefined;
 	this.entrance = undefined;
+	this.exit = undefined;
 }
 
 Dungeon.width = 20;
@@ -84,12 +94,12 @@ function DungeonGenerator(){
 
 DungeonGenerator.prototype.generate = function(){
 	var dungeon = new Dungeon(this.level);
-	Random.seed = this.level++;
-	var entrance = new Room(1+Math.floor(Random.next()*Dungeon.width-2), 1+Math.floor(Random.next()*Dungeon.height-2), Room.entrance);
+	Random.seed = this.level+1;
+	var entrance = new Room(1+Math.floor(Random.next()*Dungeon.width-2), 1+Math.floor(Random.next()*Dungeon.height-2), this.level>0?Room.entrance:Room.normal);
 	dungeon.addRoom(entrance);
 	var rooms = [entrance];
 	var size = 0;
-	var maxSize = Math.min(Math.floor(this.level/4) + 1, 6);
+	var maxSize = Math.min(Math.floor((this.level+1)/4) + 1, 6);
 	
 	do {
 		var nextRooms = [];
@@ -114,17 +124,49 @@ DungeonGenerator.prototype.generate = function(){
 		rooms = nextRooms;
 	} while (rooms.length > 0 && ++size < maxSize);
 	
+	var maxDistance = 0;
+	var exits = [];
+	for(var i = 0; i < dungeon.rooms.values.length; i++){
+		var room = dungeon.rooms.values[i];
+		if(room){
+			var dx = Math.abs(entrance.x - room.x);
+			var dy = Math.abs(entrance.y - room.y);
+			var d = dx + dy;
+			if(d > maxDistance){
+				exits = [room];
+				maxDistance = d;
+			} else if(d == maxDistance){
+				exits.push(room);
+			}
+		}
+	}
+	dungeon.exit = exits[Math.floor(Random.next()*exits.length)];
+	dungeon.exit.type = Room.exit;
+	
 	return dungeon;
 };
 
 function Camera(dungeon){
 	this.dungeon = dungeon;
-	this.x = dungeon.entrance.x * Tile.size * Room.width;
-	this.y = dungeon.entrance.y * Tile.size * Room.height;
+	this.currentRoom = this.dungeon.entrance;
+	this.x = this.currentRoom.x * Tile.size * Room.width;
+	this.y = this.currentRoom.y * Tile.size * Room.height;
 	this.targetX = this.x;
 	this.targetY = this.y;
 	this.moving = false;
 }
+
+Camera.prototype.moveTo = function(room){
+	this.x = this.targetX = room.x * Tile.size * Room.width;
+	this.y = this.targetY = room.y * Tile.size * Room.height;
+	this.currentRoom = room;
+};
+
+Camera.prototype.panTo = function(room){
+	this.targetX = room.x * Tile.size * Room.width;
+	this.targetY = room.y * Tile.size * Room.height;
+	this.currentRoom = room;
+};
 
 Camera.prototype.getTileAt = function(x,y){
 	var roomX = Math.floor(x/Room.width/Tile.size);
@@ -145,6 +187,7 @@ Camera.prototype.update = function(){
 		this.y = this.targetY;
 		Game.paused = false;
 		this.moving = false;
+		this.currentRoom.update();
 	} else {
 		Game.paused = true;
 		Game.player.x -= dx*0.8/5;

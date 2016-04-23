@@ -33,27 +33,24 @@ Player.prototype.update = function(){
 	var dy = (this.vy!=0)?(this.vy/Math.abs(this.vy)*10):0;
 	var tileX = Math.floor((this.x+12+dx)/24);
 	var tileY = Math.floor((this.y+14+dy)/24);
-	var type = Game.map.tiles.get(tileX,tileY).type;
+	var type = Game.camera.currentRoom.map().tiles.get(tileX,tileY).type;
 	if(type != Tile.floor){
 		if(type == Tile.door){
+			var r;
 			if(tileX == 0){
-				Game.dungeon.currentRoom = Game.dungeon.currentRoom.doors[Direction.left];
-				Game.camera.targetX = Game.camera.x - Tile.size*16;
-				//this.x = 336;
+				r = Game.camera.currentRoom.doors[Direction.left];
 			} else if(tileX == 15){
-				Game.dungeon.currentRoom = Game.dungeon.currentRoom.doors[Direction.right];
-				Game.camera.targetX = Game.camera.x + Tile.size*16;
-				//this.x = 24;
+				r = Game.camera.currentRoom.doors[Direction.right];
 			} else if(tileY == 0){
-				Game.dungeon.currentRoom = Game.dungeon.currentRoom.doors[Direction.up];
-				Game.camera.targetY = Game.camera.y - Tile.size*10;
-				//this.y = 190;
+				r = Game.camera.currentRoom.doors[Direction.up];
 			} else if(tileY == 9){
-				Game.dungeon.currentRoom = Game.dungeon.currentRoom.doors[Direction.down];
-				Game.camera.targetY = Game.camera.y + Tile.size*10;
-				//this.y = 24;
+				r = Game.camera.currentRoom.doors[Direction.down];
 			}
-			Game.map = Game.dungeon.currentRoom.map();
+			Game.camera.panTo(r);
+		} else if(type == Tile.stairsUp){
+			Game.previousLevel();
+		} else if(type == Tile.stairsDown){
+			Game.nextLevel();
 		}
 		this.vx = 0;
 		this.vy = 0;

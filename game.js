@@ -10,7 +10,6 @@ function GameEngine(graphics, width, height){
 	this.player = new Player();
 	this.dungeonGenerator = new DungeonGenerator(0);
 	this.dungeon = this.dungeonGenerator.generate();
-	this.map = this.dungeon.currentRoom.map();
 	this.camera = new Camera(this.dungeon);
 	this.init();
 }
@@ -28,7 +27,6 @@ GameEngine.prototype.update = function(){
 	if(!this.paused){
 		if(Key.isPressed(32)) this.nextLevel();
 		this.player.update();
-		this.map.update();
 	}
 	this.camera.update();
 	Mouse.update();
@@ -47,9 +45,17 @@ GameEngine.prototype.draw = function(){
 
 GameEngine.prototype.nextLevel = function(){
 	this.init();
+	this.dungeonGenerator.level++;
 	this.dungeon = this.dungeonGenerator.generate();
 	this.camera = new Camera(this.dungeon);
-	this.map = this.dungeon.currentRoom.map();
+};
+
+GameEngine.prototype.previousLevel = function(){
+	this.init();
+	this.dungeonGenerator.level--;
+	this.dungeon = this.dungeonGenerator.generate();
+	this.camera = new Camera(this.dungeon);
+	this.camera.moveTo(this.dungeon.exit);
 };
 
 var Game;
@@ -73,7 +79,9 @@ window.onload = function(){
 		{name:"wallBottomRight", src:"sprites/wallCornerBottomRight.png"},
 		{name:"wallBottomLeft", src:"sprites/wallCornerBottomLeft.png"},
 		{name:"tileFloor", src:"sprites/stoneFloor.png"},
-		{name:"tileDoor", src:"sprites/tileDoor.png"}
+		{name:"tileDoor", src:"sprites/tileDoor.png"},
+		{name:"stairsUp", src:"sprites/stairsUp.png"},
+		{name:"stairsDown", src:"sprites/stairsDown.png"}
 	],
 	function(){
 		
