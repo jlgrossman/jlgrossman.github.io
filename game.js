@@ -1,7 +1,7 @@
 // game
 function GameEngine(graphics, width, height){
 	this.width = width||384;
-	this.height = height||240;
+	this.height = height||260;
 	this.paused = false;
 	this.graphics = graphics;
 	this.graphics.canvas.width = this.width;
@@ -9,8 +9,8 @@ function GameEngine(graphics, width, height){
 	this.thread = undefined;
 	this.player = new Player();
 	this.dungeonGenerator = new DungeonGenerator(0);
-	this.dungeon = this.dungeonGenerator.generate();
-	this.camera = new Camera(this.dungeon);
+	this.camera = new Camera(this.dungeonGenerator.generate());
+	this.hud = new HUD(0,this.height-20);
 	this.init();
 }
 
@@ -21,6 +21,7 @@ GameEngine.prototype.run = function(){ this.thread = setInterval(this.loop, 17);
 GameEngine.prototype.init = function(){
 	this.player.x = this.width/2;
 	this.player.y = this.height/2;
+	Key.reset();
 };
 
 GameEngine.prototype.update = function(){
@@ -29,6 +30,8 @@ GameEngine.prototype.update = function(){
 		this.player.update();
 	}
 	this.camera.update();
+	this.hud.update();
+	
 	Mouse.update();
 	Key.update();
 };
@@ -40,22 +43,25 @@ GameEngine.prototype.draw = function(){
 		
 		this.camera.draw(this.graphics);
 		this.player.draw(this.graphics);
+		this.hud.draw(this.graphics);
 	}
 };
 
 GameEngine.prototype.nextLevel = function(){
 	this.init();
 	this.dungeonGenerator.level++;
-	this.dungeon = this.dungeonGenerator.generate();
-	this.camera = new Camera(this.dungeon);
+	this.camera = new Camera(this.dungeonGenerator.generate());
+	this.player.x = this.camera.currentRoom.stairs().x+24;
+	this.player.y = this.camera.currentRoom.stairs().y;
 };
 
 GameEngine.prototype.previousLevel = function(){
 	this.init();
 	this.dungeonGenerator.level--;
-	this.dungeon = this.dungeonGenerator.generate();
-	this.camera = new Camera(this.dungeon);
-	this.camera.moveTo(this.dungeon.exit);
+	this.camera = new Camera(this.dungeonGenerator.generate());
+	this.camera.moveTo(this.camera.dungeon.exit);
+	this.player.x = this.camera.currentRoom.stairs().x+24;
+	this.player.y = this.camera.currentRoom.stairs().y;
 };
 
 var Game;
@@ -66,7 +72,8 @@ window.onload = function(){
 	
 	Sprites = new SpriteLoader([
 		{name:"debug", src:"sprites/debug.png"},
-		{name:"playerRun", src:"sprites/run.png", length: 16, type: "animation"},
+		{name:"playerRunLeft", src:"sprites/runLeft.png", length: 16, type: "animation"},
+		{name:"playerRunRight", src:"sprites/runRight.png", length: 16, type: "animation"},
 		{name:"playerJump", src:"sprites/jump.png", length: 8, loop: 7, type: "animation"},
 		{name:"playerFall", src:"sprites/fall.png", length: 6, type: "animation"},
 		{name:"wall", src:"sprites/wall.png"},
@@ -85,24 +92,11 @@ window.onload = function(){
 	],
 	function(){
 		
-		Maps.debug = new Map(new Array2D(16, 10,[
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-		1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1,
-		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1,
-		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1,
-		1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
-		]));
-		
 		var canvas = document.getElementById("canvas");
-		Mouse.offset = {x: canvas.offsetLeft, y: canvas.offsetTop};
 		Game = new GameEngine(canvas.getContext("2d"));
 		Game.run();
-		
+		Mouse.offset = {x: canvas.offsetLeft, y: canvas.offsetTop};
+		Mouse.scale = canvas.offsetWidth/Game.width;
 	});
 	
 };

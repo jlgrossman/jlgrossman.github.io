@@ -4,7 +4,11 @@ function Player(){
 	this.y = 0;
 	this.vx = 0;
 	this.vy = 0;
-	this.currentAnimation = Sprites.playerRun;
+	this.currentAnimation = Sprites.playerRunRight;
+	this.hp = 100;
+	this.maxHp = 100;
+	this.xp = 0;
+	this.level = 0;
 }
 
 Player.prototype.currentTile = function(){
@@ -13,6 +17,17 @@ Player.prototype.currentTile = function(){
 
 Player.prototype.update = function(){
 	var walking = false;
+	if(Mouse.isDown()){
+		var p = Mouse.current;
+		var dx = p.x - Game.width*Mouse.scale/2;
+		var dy = p.y - Game.height*Mouse.scale/2;
+		var d = Math.sqrt(dx*dx+dy*dy);
+		if(d > 0){
+			this.vx = dx/d;
+			this.vy = dy/d;
+			walking = true;
+		}
+	}
 	if(Key.isDown(87)){
 		walking = true;
 		this.vy = -1;
@@ -55,11 +70,21 @@ Player.prototype.update = function(){
 		this.vx = 0;
 		this.vy = 0;
 	}
+	var ms = 1;
+	if(Key.isDown(16)){
+		if(Key.isDown(65) || Key.isDown(68)) this.vx*=2, ms=2;
+		if(Key.isDown(87) || Key.isDown(83)) this.vy*=2, ms=2;
+	}
 	var v = this.vx*this.vx+this.vy*this.vy;
-	if(v>1){
+	if(v>ms){
 		v = Math.sqrt(v);
-		this.vx *= 1/v;
-		this.vy *= 1/v;
+		this.vx *= ms/v;
+		this.vy *= ms/v;
+	}
+	if(this.vx > 0){
+		this.currentAnimation = Sprites.playerRunRight;
+	} else if(this.vx < 0){
+		this.currentAnimation = Sprites.playerRunLeft;
 	}
 	this.x += this.vx;
 	this.y += this.vy;
@@ -69,5 +94,20 @@ Player.prototype.update = function(){
 };
 
 Player.prototype.draw = function(gfx){
+	this.currentAnimation.draw(gfx,this.x,this.y);
+};
+
+function Enemy(x,y,type){
+	this.x = x;
+	this.y = y;
+	this.type = type;
+	this.currentAnimation = Sprites.playerRunRight.clone();
+}
+
+Enemy.prototype.update = function(){
+	this.currentAnimation.update();
+};
+
+Enemy.prototype.draw = function(gfx){
 	this.currentAnimation.draw(gfx,this.x,this.y);
 };

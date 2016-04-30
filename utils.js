@@ -6,7 +6,8 @@ var Key = {
 	keyUp: function(e){ Key.current[e.keyCode] = false; },
 	isDown: function(key){ return Key.current[key]||false; },
 	isPressed: function(key){ return (!Key.previous[key]&&Key.current[key]); },
-	update: function(){ Key.previous = Key.current.slice(); }
+	update: function(){ Key.previous = Key.current.slice(); },
+	reset: function(){ Key.current = Key.previous = []; }
 };
 
 var Mouse = {
@@ -14,11 +15,12 @@ var Mouse = {
 	previous: {x: 0, y: 0},
 	velocity: {x: 0, y: 0},
 	offset: {x: 0, y: 0},
+	scale: {x: 0, y: 0},
 	clicked: false,
 	previousClicked: false,
 	mouseDown: function(e){ Mouse.clicked = true; },
 	mouseUp: function(e){ Mouse.clicked = false; },
-	mouseMove: function(e){ Mouse.current = {x: e.pageX - Mouse.offset.x, y: e.pageY - Mouse.offset.y}; },
+	mouseMove: function(e){ Mouse.current = {x: (e.pageX - Mouse.offset.x), y: e.pageY - Mouse.offset.y}; },
 	isDown: function(){ return Mouse.clicked; },
 	isClicked: function(){ return !Mouse.previousClicked&&Mouse.clicked; },
 	update: function(){
@@ -52,6 +54,18 @@ var Direction = {
 			case Direction.down: return {x:0,y:1};
 		}
 	}
+};
+
+var Color = {
+	red: "#C45A5C",
+	green: "#91C45A",
+	blue: "#359C9A",
+	purple: "#8D5AC4",
+	yellow: "#D6DB4B",
+	black: "#000",
+	white: "#FFF",
+	grey: "#999",
+	darkGrey: "#444"
 };
 
 function Array2D(width, height, values){

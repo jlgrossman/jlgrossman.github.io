@@ -19,7 +19,21 @@ Tile.wallBottomLeft = 9;
 Tile.door = 10;
 Tile.stairsUp = 11;
 Tile.stairsDown = 12;
-Tile.spriteNames = ["tileFloor", "wall", "wallLeft", "wallRight", "wallTop", "wallBottom", "wallTopLeft", "wallTopRight", "wallBottomRight", "wallBottomLeft", "tileFloor", "stairsUp", "stairsDown"];
+Tile.spriteNames = [
+	"tileFloor",
+	"wall",
+	"wallLeft",
+	"wallRight",
+	"wallTop",
+	"wallBottom",
+	"wallTopLeft",
+	"wallTopRight",
+	"wallBottomRight",
+	"wallBottomLeft",
+	"tileFloor",
+	"stairsUp",
+	"stairsDown"
+];
 
 Tile.size = 24;
 
