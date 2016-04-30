@@ -93,6 +93,6 @@ Array2D.prototype.clone = function(){
 
 window.onkeydown = Key.keyDown;
 window.onkeyup = Key.keyUp;
-window.onmousemove = window.touchmove = Mouse.mouseMove;
-window.onmousedown = window.touchstart = Mouse.mouseDown;
-window.onmouseup = window.touchend = Mouse.mouseUp;
+window.onmousemove = window.ontouchmove = Mouse.mouseMove;
+window.onmousedown = window.ontouchstart = Mouse.mouseDown;
+window.onmouseup = window.ontouchend = Mouse.mouseUp;
