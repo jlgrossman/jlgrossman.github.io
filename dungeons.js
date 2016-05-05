@@ -31,7 +31,7 @@ Room.prototype.stairs = function(){
 
 Room.prototype.enemies = function(){
 	if(!this.enemyArray){
-		this.enemyArray = [];
+		this.enemyArray = new GameObjectArray();
 		Random.seed = this.x * this.y;
 		if(this.type == Room.normal && Random.next() < Math.min(0.6, 0.2*this.level)){
 			var numEnemies = Math.floor(Random.next()*Math.min(5,this.level)+1);
@@ -87,18 +87,12 @@ Room.prototype.map = function(){
 
 Room.prototype.update = function(){
 	this.map().update();
-	var e = this.enemies();
-	for(var i = 0; i < e.length; i++){
-		e[i].update();
-	}
+	this.enemies().update();
 };
 
 Room.prototype.draw = function(gfx){
 	this.map().draw(gfx);
-	var e = this.enemies();
-	for(var i = 0; i < e.length; i++){
-		e[i].draw(gfx);
-	}
+	this.enemies().draw(gfx);
 };
 
 function Dungeon(level){
@@ -230,7 +224,7 @@ Camera.prototype.getTileAt = function(x,y){
 	var tileY = Math.floor((y-roomY*Room.height*Tile.size)/Tile.size);
 	var room = this.dungeon.rooms.get(roomX,roomY);
 	if(room){
-		return room.map().tiles.get(tileX,tileY); // generates map if it doesnt exist
+		return room.map().tiles.get(tileX,tileY);
 	}
 };
 

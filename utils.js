@@ -18,7 +18,7 @@ var Mouse = {
 	scale: {x: 0, y: 0},
 	clicked: false,
 	previousClicked: false,
-	mouseDown: function(e){ Mouse.clicked = true; },
+	mouseDown: function(e){ Mouse.clicked = true; Mouse.mouseMove(e); },
 	mouseUp: function(e){ Mouse.clicked = false; },
 	mouseMove: function(e){ Mouse.current = {x: (e.pageX - Mouse.offset.x), y: e.pageY - Mouse.offset.y}; },
 	isDown: function(){ return Mouse.clicked; },
@@ -91,8 +91,30 @@ Array2D.prototype.clone = function(){
 	return new Array2D(this.width, this.height, this.values.slice());
 };
 
+function GameObjectArray(){
+	this.values = [];
+}
+
+GameObjectArray.prototype.size = function(){ return this.values.length; }
+GameObjectArray.prototype.get = function(index){ return this.values[index]; };
+GameObjectArray.prototype.indexOf = function(object){ return this.values.indexOf(object); };
+GameObjectArray.prototype.push = function(object){ return this.values.push(object); };
+GameObjectArray.prototype.remove = function(index){ return index>=0&&this.values.splice(index,1); };
+
+GameObjectArray.prototype.update = function(){
+	for(var i = 0; i < this.values.length; i++){
+		this.values[i].update();
+	}
+};
+
+GameObjectArray.prototype.draw = function(gfx){
+	for(var i = 0; i < this.values.length; i++){
+		this.values[i].draw(gfx);
+	}
+};
+
 window.onkeydown = Key.keyDown;
 window.onkeyup = Key.keyUp;
-window.onmousemove = window.touchmove = Mouse.mouseMove;
-window.onmousedown = window.touchstart = Mouse.mouseDown;
-window.onmouseup = window.touchend = Mouse.mouseUp;
+window.onmousemove = window.ontouchmove = Mouse.mouseMove;
+window.onmousedown = window.ontouchstart = Mouse.mouseDown;
+window.onmouseup = window.ontouchend = Mouse.mouseUp;

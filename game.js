@@ -51,8 +51,10 @@ GameEngine.prototype.nextLevel = function(){
 	this.init();
 	this.dungeonGenerator.level++;
 	this.camera = new Camera(this.dungeonGenerator.generate());
-	this.player.x = this.camera.currentRoom.stairs().x+24;
-	this.player.y = this.camera.currentRoom.stairs().y;
+	this.player.x = this.camera.currentRoom.stairs().x;
+	this.player.y = this.camera.currentRoom.stairs().y+28;
+	this.player.vx = 0;
+	this.player.vy = 1;
 };
 
 GameEngine.prototype.previousLevel = function(){
@@ -60,8 +62,10 @@ GameEngine.prototype.previousLevel = function(){
 	this.dungeonGenerator.level--;
 	this.camera = new Camera(this.dungeonGenerator.generate());
 	this.camera.moveTo(this.camera.dungeon.exit);
-	this.player.x = this.camera.currentRoom.stairs().x+24;
-	this.player.y = this.camera.currentRoom.stairs().y;
+	this.player.x = this.camera.currentRoom.stairs().x;
+	this.player.y = this.camera.currentRoom.stairs().y-28;
+	this.player.vx = 0;
+	this.player.vy = -1;
 };
 
 var Game;

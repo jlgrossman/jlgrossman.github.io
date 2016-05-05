@@ -41,6 +41,9 @@ Meter.prototype.draw = function(gfx){
 	gfx.fillRect(this.x, this.y, barW, this.height);
 	gfx.fillStyle = this.bgColor;
 	gfx.fillRect(this.x + barW, this.y, bgW, this.height);
+	gfx.font = "10px monospace";
+	gfx.fillStyle = Color.black;
+	gfx.fillText(this.name, this.x+2, this.y+this.height-1);
 	gfx.fillStyle = Color.white;
-	gfx.fillText(this.name, this.x, this.y+this.height);
+	gfx.fillText(this.name, this.x+2, this.y+this.height-2);
 };

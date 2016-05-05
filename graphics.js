@@ -52,7 +52,7 @@ function Animation(src, length, loopFrame, callback){
 	}
 }
 
-Animation.PAUSED = false;
+Animation.paused = false;
 
 Animation.prototype.clone = function(){
 	var a = new Animation();
@@ -73,7 +73,7 @@ Animation.prototype.draw = function(gfx,x,y){
 	}
 };
 Animation.prototype.update = function(){
-	if(!Animation.PAUSED && this.isPlaying && ++this.currentFrame >= this.length){
+	if(!Animation.paused && this.isPlaying && ++this.currentFrame >= this.length){
 		this.currentFrame = this.loopFrame;
 	}
 };
