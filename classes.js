@@ -15,12 +15,11 @@ Player.prototype.update = function(){
 	var walking = false;
 	if(Mouse.isDown()){
 		var p = Mouse.current;
-		var dx = p.x - Game.width*Mouse.scale/2;
-		var dy = p.y - Game.height*Mouse.scale/2;
-		var d = Math.sqrt(dx*dx+dy*dy);
-		if(d > 0){
-			this.vx = dx/d;
-			this.vy = dy/d;
+		var dx = p.x/Mouse.scale - this.x-12;
+		var dy = p.y/Mouse.scale - this.y-12;
+		if(Math.abs(dx) > 8 || Math.abs(dy) > 8){
+			this.vx = dx;
+			this.vy = dy;
 			walking = true;
 		}
 	}
@@ -74,6 +73,7 @@ Player.prototype.update = function(){
 	if(Key.isDown(16)){
 		if(Key.isDown(65) || Key.isDown(68)) this.vx*=2, ms=2;
 		if(Key.isDown(87) || Key.isDown(83)) this.vy*=2, ms=2;
+		if(Mouse.isDown()) this.vx *= 2, this.vy *= 2, ms=2;
 	}
 	var v = this.vx*this.vx+this.vy*this.vy;
 	if(v>ms){
@@ -153,4 +153,32 @@ Enemy.prototype.update = function(){
 
 Enemy.prototype.draw = function(gfx){
 	this.currentAnimation.draw(gfx,this.x,this.y);
+};
+
+function Box(x,y){
+	this.x = x;
+	this.y = y;
+	this.vx = 0;
+	this.vy = 0;
+	this.sprite = Sprites.box;
+}
+
+Box.prototype.update = function(){
+	var dx = Game.player.x - this.x;
+	var dy = Game.player.y - this.y;
+	var dsq = dx*dx+dy*dy;
+	if(dsq < 225){
+		var d = Math.sqrt(dsq);
+		var diff = d-15;
+		this.vx = diff*dx/d;
+		this.vy = diff*dy/d;
+	}
+	this.x += this.vx;
+	this.y += this.vy;
+	this.vx *= 0.9;
+	this.vy *= 0.9;
+};
+
+Box.prototype.draw = function(gfx){
+	this.sprite.draw(gfx,this.x, this.y);
 };

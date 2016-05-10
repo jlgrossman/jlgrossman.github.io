@@ -27,7 +27,8 @@ var Mouse = {
 		Mouse.velocity = {x: Mouse.current.x - Mouse.previous.x, y: Mouse.current.y - Mouse.previous.y};
 		Mouse.previous = Mouse.current;
 		Mouse.previousClicked = Mouse.clicked;
-	}
+	},
+	reset: function(){ Mouse.clicked = false; }
 	
 };
 

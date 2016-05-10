@@ -19,6 +19,7 @@ Tile.wallBottomLeft = 9;
 Tile.door = 10;
 Tile.stairsUp = 11;
 Tile.stairsDown = 12;
+Tile.debug = 13;
 Tile.spriteNames = [
 	"tileFloor",
 	"wall",
@@ -32,7 +33,8 @@ Tile.spriteNames = [
 	"wallBottomLeft",
 	"tileFloor",
 	"stairsUp",
-	"stairsDown"
+	"stairsDown",
+	"debug"
 ];
 
 Tile.size = 24;

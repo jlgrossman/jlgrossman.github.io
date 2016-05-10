@@ -22,6 +22,7 @@ GameEngine.prototype.init = function(){
 	this.player.x = this.width/2;
 	this.player.y = this.height/2;
 	Key.reset();
+	Mouse.reset();
 };
 
 GameEngine.prototype.update = function(){
@@ -92,7 +93,8 @@ window.onload = function(){
 		{name:"tileFloor", src:"sprites/stoneFloor.png"},
 		{name:"tileDoor", src:"sprites/tileDoor.png"},
 		{name:"stairsUp", src:"sprites/stairsUp.png"},
-		{name:"stairsDown", src:"sprites/stairsDown.png"}
+		{name:"stairsDown", src:"sprites/stairsDown.png"},
+		{name:"box", src:"sprites/box.png"}
 	],
 	function(){
 		
@@ -102,5 +104,9 @@ window.onload = function(){
 		Mouse.offset = {x: canvas.offsetLeft, y: canvas.offsetTop};
 		Mouse.scale = canvas.offsetWidth/Game.width;
 	});
+	
+	window.onresize = function(){
+		Mouse.scale = canvas.offsetWidth/Game.width;
+	};
 	
 };

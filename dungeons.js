@@ -7,10 +7,12 @@ function Room(x, y, type, level){
 	this.doors = [];
 	this.tileMap = undefined;
 	this.enemyArray = undefined;
+	this.objectArray = undefined;
 }
 Room.normal = 0;
-Room.entrance = 1;
-Room.exit = 2;
+Room.locked = 1;
+Room.entrance = 2;
+Room.exit = 3;
 
 Room.width = 16;
 Room.height = 10;
@@ -43,6 +45,13 @@ Room.prototype.enemies = function(){
 		}
 	}
 	return this.enemyArray;
+};
+
+Room.prototype.objects = function(){
+	if(!this.objectArray){
+		this.objectArray = new GameObjectArray();
+	}
+	return this.objectArray;
 };
 
 Room.prototype.map = function(){
@@ -79,6 +88,8 @@ Room.prototype.map = function(){
 			tiles.set(Math.floor(Random.next()*(Room.width-8))+4,Math.floor(Random.next()*(Room.height-8))+4,Tile.stairsUp);
 		} else if(this.type == Room.exit){
 			tiles.set(Math.floor(Random.next()*(Room.width-8))+4,Math.floor(Random.next()*(Room.height-8))+4,Tile.stairsDown);
+		} else if(this.type == Room.locked){
+			tiles.set(1,1,Tile.debug);
 		}
 		this.tileMap = new Map(tiles);
 	}
@@ -88,11 +99,13 @@ Room.prototype.map = function(){
 Room.prototype.update = function(){
 	this.map().update();
 	this.enemies().update();
+	this.objects().update();
 };
 
 Room.prototype.draw = function(gfx){
 	this.map().draw(gfx);
 	this.enemies().draw(gfx);
+	this.objects().draw(gfx);
 };
 
 function Dungeon(level){
@@ -189,8 +202,32 @@ DungeonGenerator.prototype.generate = function(){
 			}
 		}
 	}
+	
 	dungeon.exit = exits[Math.floor(Random.next()*exits.length)];
 	dungeon.exit.type = Room.exit;
+	
+	var numLocks = 0;
+	var normalRooms = [];
+	for(var i = 0; i < dungeon.rooms.values.length; i++){
+		var room = dungeon.rooms.values[i];
+		if(room && room.type == Room.normal){
+			var doors = room.doors.filter(function(){return true;}); // remove undefined
+			if(doors.length == 1 && Random.next() < 0.3){
+				room.type = Room.locked;
+				numLocks++;
+			} else {
+				normalRooms.push(room);
+			}
+		}
+	}
+	
+	while(numLocks-- > 0){
+		var index = Math.floor(Random.next() * normalRooms.length);
+		var room = normalRooms.splice(index,1)[0];
+		if(room){
+			room.objects().push(new Box(179, 109)); // TODO: change to key chest or something
+		}
+	}
 	
 	return dungeon;
 };
