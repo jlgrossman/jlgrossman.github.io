@@ -1,4 +1,5 @@
 // game
+// CHECK LEVEL 29
 function GameEngine(graphics, width, height){
 	this.width = width||384;
 	this.height = height||260;
@@ -51,7 +52,7 @@ GameEngine.prototype.draw = function(){
 GameEngine.prototype.nextLevel = function(){
 	this.init();
 	this.dungeonGenerator.level++;
-	this.camera = new Camera(this.dungeonGenerator.generate());
+	this.camera.show(this.dungeonGenerator.generate());
 	this.player.x = this.camera.currentRoom.stairs().x;
 	this.player.y = this.camera.currentRoom.stairs().y+28;
 	this.player.vx = 0;
@@ -61,7 +62,7 @@ GameEngine.prototype.nextLevel = function(){
 GameEngine.prototype.previousLevel = function(){
 	this.init();
 	this.dungeonGenerator.level--;
-	this.camera = new Camera(this.dungeonGenerator.generate());
+	this.camera.show(this.dungeonGenerator.generate());
 	this.camera.moveTo(this.camera.dungeon.exit);
 	this.player.x = this.camera.currentRoom.stairs().x;
 	this.player.y = this.camera.currentRoom.stairs().y-28;
@@ -79,6 +80,8 @@ window.onload = function(){
 		{name:"debug", src:"sprites/debug.png"},
 		{name:"playerRunLeft", src:"sprites/runLeft.png", length: 16, type: "animation"},
 		{name:"playerRunRight", src:"sprites/runRight.png", length: 16, type: "animation"},
+		{name:"playerIdleLeft", src:"sprites/idleLeft.png", length: 10, type: "animation"},
+		{name:"playerIdleRight", src:"sprites/idleRight.png", length: 10, type: "animation"},
 		{name:"playerJump", src:"sprites/jump.png", length: 8, loop: 7, type: "animation"},
 		{name:"playerFall", src:"sprites/fall.png", length: 6, type: "animation"},
 		{name:"wall", src:"sprites/wall.png"},
@@ -97,7 +100,6 @@ window.onload = function(){
 		{name:"box", src:"sprites/box.png"}
 	],
 	function(){
-		
 		var canvas = document.getElementById("canvas");
 		Game = new GameEngine(canvas.getContext("2d"));
 		Game.run();

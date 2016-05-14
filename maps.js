@@ -17,9 +17,10 @@ Tile.wallTopRight = 7;
 Tile.wallBottomRight = 8;
 Tile.wallBottomLeft = 9;
 Tile.door = 10;
-Tile.stairsUp = 11;
-Tile.stairsDown = 12;
-Tile.debug = 13;
+Tile.lockedDoor = 11;
+Tile.stairsUp = 12;
+Tile.stairsDown = 13;
+Tile.debug = 14;
 Tile.spriteNames = [
 	"tileFloor",
 	"wall",
@@ -32,6 +33,7 @@ Tile.spriteNames = [
 	"wallBottomRight",
 	"wallBottomLeft",
 	"tileFloor",
+	"debug",
 	"stairsUp",
 	"stairsDown",
 	"debug"
@@ -64,21 +66,13 @@ function Map(tileArray, tileSize){
 Map.prototype.get = function(x,y){ return this.tiles.get(Math.floor(x/this.tileSize), Math.floor(y/this.tileSize)); };
 
 Map.prototype.update = function(){
-	for(var y = 0; y < this.tiles.height; y++){
-		for(var x = 0; x < this.tiles.width; x++){
-			this.tiles.get(x,y).update();
-		}
+	for(var i = 0; i < this.tiles.values.length; i++){
+		this.tiles.values[i].update();
 	}
 };
 
-Map.prototype.draw = function(gfx, startX, startY, endX, endY){
-	startX = startX||0;
-	startY = startY||0;
-	endX = endX||this.tiles.width;
-	endY = endY||this.tiles.height;
-	for(var y = startY; y < endY; y++){
-		for(var x = startX; x < endX; x++){
-			this.tiles.get(x,y).draw(gfx);
-		}
+Map.prototype.draw = function(gfx){
+	for(var i = 0; i < this.tiles.values.length; i++){
+		this.tiles.values[i].draw(gfx);
 	}
 };

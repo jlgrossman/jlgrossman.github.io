@@ -1,14 +1,20 @@
 // classes
+function Stats(hp, xp, attack, defense, speed){
+	this.maxHp = this.hp = hp;
+	this.xp = xp;
+	this.attack = attack;
+	this.defense = defense;
+	this.speed = speed;
+}
+
 function Player(){
 	this.x = 0;
 	this.y = 0;
 	this.vx = 0;
 	this.vy = 0;
 	this.currentAnimation = Sprites.playerRunRight;
-	this.hp = 100;
-	this.maxHp = 100;
-	this.xp = 0;
 	this.level = 0;
+	this.stats = new Stats(100,0,1,1,1);
 }
 
 Player.prototype.update = function(){
@@ -52,7 +58,8 @@ Player.prototype.update = function(){
 			var acx = Math.abs(cx);
 			var acy = Math.abs(cy);
 			if(acx < 24 && acy < 24){
-				if(type >= Tile.wall && type <= Tile.wallBottomLeft){
+				var door = Game.camera.currentRoom.doors[i];
+				if((type >= Tile.wall && type <= Tile.wallBottomLeft) || (door && type == Tile.lockedDoor && door.locked)){
 					var dcx = 24 - acx;
 					var dcy = 24 - acy;
 					if(cx < 0) dcx *= -1;
@@ -60,7 +67,7 @@ Player.prototype.update = function(){
 					if(Math.abs(dcx) < Math.abs(dcy)) this.x += dcx;
 					else this.y += dcy;
 				} else if(type == Tile.door){
-					Game.camera.panTo(Game.camera.currentRoom.doors[i]);
+					Game.camera.panTo(door.room);
 				} else if(type == Tile.stairsUp){
 					Game.previousLevel();
 				} else if(type == Tile.stairsDown){
@@ -81,6 +88,8 @@ Player.prototype.update = function(){
 		this.vx *= ms/v;
 		this.vy *= ms/v;
 	}
+	if(Math.abs(this.vx) < 0.01) this.vx = 0;
+	if(Math.abs(this.vy) < 0.01) this.vy = 0;
 	if(this.vx > 0){
 		this.currentAnimation = Sprites.playerRunRight;
 	} else if(this.vx < 0){

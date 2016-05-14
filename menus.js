@@ -6,7 +6,7 @@ function HUD(x, y){
 }
 
 HUD.prototype.update = function(){
-	this.healthMeter.value = Game.player.hp/Game.player.maxHp;
+	this.healthMeter.value = Game.player.stats.hp/Game.player.stats.maxHp;
 	this.healthMeter.update();
 };
 

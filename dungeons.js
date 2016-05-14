@@ -17,8 +17,8 @@ Room.exit = 3;
 Room.width = 16;
 Room.height = 10;
 
-Room.prototype.addDoor = function(room, direction){
-	this.doors[direction] = room;
+Room.prototype.addDoor = function(room, direction, locked){
+	this.doors[direction] = {room:room, locked:locked||false};
 };
 
 Room.prototype.stairs = function(){
@@ -76,12 +76,13 @@ Room.prototype.map = function(){
 		}
 		for(var i = 0; i < 4; i++){
 			if(this.doors[i] != undefined){
+				var sprite = this.doors[i].locked?Tile.lockedDoor:Tile.door;
 				var v = Direction.vector(i);
 				var x = (v.x == 0)?(8):(7.5+v.x*7.5);
 				var y = (v.y == 0)?(5):(4.5+v.y*4.5);
-				tiles.set(x,y,Tile.door);
-				if(v.x == 0) tiles.set(x-1, y, Tile.door);
-				else tiles.set(x, y-1, Tile.door);
+				tiles.set(x,y,sprite);
+				if(v.x == 0) tiles.set(x-1, y, sprite);
+				else tiles.set(x, y-1, sprite);
 			}
 		}
 		if(this.type == Room.entrance){
@@ -94,6 +95,12 @@ Room.prototype.map = function(){
 		this.tileMap = new Map(tiles);
 	}
 	return this.tileMap;
+};
+
+Room.prototype.onEnter = function(){
+};
+
+Room.prototype.onExit = function(){
 };
 
 Room.prototype.update = function(){
@@ -111,8 +118,6 @@ Room.prototype.draw = function(gfx){
 function Dungeon(level){
 	this.level = level;
 	this.rooms = new Array2D(20,20);
-	this.doors = new Array2D(20,20);
-	this.currentRoom = undefined;
 	this.entrance = undefined;
 	this.exit = undefined;
 }
@@ -121,33 +126,70 @@ Dungeon.width = 20;
 Dungeon.height = 20;
 Dungeon.prototype.addRoom = function(room){
 	if(this.rooms.values.length == 0){
-		this.currentRoom = room;
 		this.entrance = room;
 	}
 	this.rooms.set(room.x, room.y, room);
 };
 Dungeon.prototype.addDoor = function(room1, room2, direction){
-	if(this.doors.get(room1.x, room1.y) == undefined) this.doors.set(room1.x, room1.y, []);
-	if(this.doors.get(room2.x, room2.y) == undefined) this.doors.set(room2.x, room2.y, []);
-	this.doors.get(room1.x, room1.y)[direction] = room2;
-	this.doors.get(room2.x, room2.y)[Direction.reverse(direction)] = room1;
 	room1.addDoor(room2, direction);
 	room2.addDoor(room1, Direction.reverse(direction));
 };
 
-Dungeon.prototype.trace = function(){
-	var str = "[";
-	for(var y = 0; y < Dungeon.height; y++){
-		for(var x = 0; x < Dungeon.width; x++){
-			if(this.rooms.get(x,y) == undefined){
-				str += "0 ";
-			} else {
-				str += ""+(this.rooms.get(x,y).type+1)+" ";
+Dungeon.prototype.lockDoor = function(room, door){
+	var direction = room.doors.indexOf(door);
+	room.doors[direction].locked = true;
+	room.doors[direction].room.doors[Direction.reverse(direction)].locked = true;
+};
+
+Dungeon.prototype.unlockDoor = function(room, door){
+	var direction = room.doors.indexOf(door);
+	room.doors[direction].locked = false;
+	room.doors[direction].room.doors[Direction.reverse(direction)].locked = false;
+};
+
+Dungeon.prototype.trace = function(boring){
+	if(!boring){
+		var colors = "#FFF #000 #D23 #23D #2A3".split(" ");
+		for(var y = 0; y < Dungeon.height; y++){
+			var str = "";
+			var arr = [];
+			var print = false;
+			for(var x = 0; x < Dungeon.width; x++){
+				if(this.rooms.get(x,y) == undefined){
+					str += "%c + ";
+					arr.push("border:3px solid white; color:"+colors[0]);
+				} else {
+					print = true;
+					var t = this.rooms.get(x,y).type;
+					str += "%c "+t+" ";
+					arr.push("border:3px solid white; text-shadow:2px 2px 2px rgba(0,0,0,0.35);background-color:"+colors[t+1]+";color:white");
+				}
+			}
+			if(print){
+				arr.unshift(str);
+				(y%2==0?console.log:console.debug).apply(console,arr);
 			}
 		}
-		str += "\n";
+	} else {
+		var str = "";
+		for(var y = 0; y < Dungeon.height; y++){
+			for(var x = 0; x < Dungeon.width; x++){
+				if(this.rooms.get(x,y) == undefined){
+					str += "+ ";
+				} else {
+					str += ""+(this.rooms.get(x,y).type)+" ";
+				}
+			}
+			str += "\n";
+		}
+		console.log(str);
 	}
-	console.log(str);
+};
+
+Dungeon.prototype.onEnter = function(){
+};
+
+Dungeon.prototype.onExit = function(){
 };
 
 function DungeonGenerator(){
@@ -157,11 +199,11 @@ function DungeonGenerator(){
 DungeonGenerator.prototype.generate = function(){
 	var dungeon = new Dungeon(this.level);
 	Random.seed = this.level+1;
-	var entrance = new Room(1+Math.floor(Random.next()*Dungeon.width-2), 1+Math.floor(Random.next()*Dungeon.height-2), this.level>0?Room.entrance:Room.normal, this.level);
+	var entrance = new Room(1+Math.floor(Random.next()*(Dungeon.width-2)), 1+Math.floor(Random.next()*(Dungeon.height-2)), this.level>0?Room.entrance:Room.normal, this.level);
 	dungeon.addRoom(entrance);
 	var rooms = [entrance];
 	var size = 0;
-	var maxSize = Math.min(Math.floor((this.level+1)/4) + 1, 6);
+	var maxSize = Math.min(Math.floor((this.level+1)/4) + 1, 6)+Math.min(Math.floor(this.level/30),4);
 	
 	do {
 		var nextRooms = [];
@@ -212,8 +254,9 @@ DungeonGenerator.prototype.generate = function(){
 		var room = dungeon.rooms.values[i];
 		if(room && room.type == Room.normal){
 			var doors = room.doors.filter(function(){return true;}); // remove undefined
-			if(doors.length == 1 && Random.next() < 0.3){
+			if(doors.length == 1 && Random.next() < 0.2){
 				room.type = Room.locked;
+				dungeon.lockDoor(room, doors[0]);
 				numLocks++;
 			} else {
 				normalRooms.push(room);
@@ -233,25 +276,39 @@ DungeonGenerator.prototype.generate = function(){
 };
 
 function Camera(dungeon){
-	this.dungeon = dungeon;
-	this.currentRoom = this.dungeon.entrance;
-	this.x = this.currentRoom.x * Tile.size * Room.width;
-	this.y = this.currentRoom.y * Tile.size * Room.height;
-	this.targetX = this.x;
-	this.targetY = this.y;
+	this.dungeon = undefined;
+	this.currentRoom = undefined;
+	this.x = this.targetX = 0;
+	this.y = this.targetY = 0;
 	this.moving = false;
+	if(dungeon) this.show(dungeon);
 }
 
+Camera.prototype.show = function(dungeon){
+	if(this.dungeon) this.dungeon.onExit();
+	this.dungeon = dungeon;
+	this.currentRoom = undefined;
+	this.x = this.targetX = 0;
+	this.y = this.targetY = 0;
+	this.moving = false;
+	this.moveTo(this.dungeon.entrance);
+	dungeon.onEnter();
+};
+
 Camera.prototype.moveTo = function(room){
+	if(this.currentRoom) this.currentRoom.onExit();
 	this.x = this.targetX = room.x * Tile.size * Room.width;
 	this.y = this.targetY = room.y * Tile.size * Room.height;
 	this.currentRoom = room;
+	room.onEnter();
 };
 
 Camera.prototype.panTo = function(room){
+	if(this.currentRoom) this.currentRoom.onExit();
 	this.targetX = room.x * Tile.size * Room.width;
 	this.targetY = room.y * Tile.size * Room.height;
 	this.currentRoom = room;
+	room.onEnter();
 };
 
 Camera.prototype.getTileAt = function(x,y){
